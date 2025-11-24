@@ -4,6 +4,7 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\ProductController;
@@ -13,13 +14,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::resource('products', ProductController::class)->except(['create', 'show', 'edit']);
-Route::get('/dashboard', [ProductController::class, 'index'])->name('dashboard');
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
-Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit', 'index']);
-
-Route::get('/', function () {
-    return redirect()->route('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::resource('products', ProductController::class)->except(['create', 'show', 'edit']);
+    Route::get('/dashboard', [ProductController::class, 'index'])->name('dashboard');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+    Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit', 'index']);
 });
 
 Route::middleware(['auth'])->group(function () {
