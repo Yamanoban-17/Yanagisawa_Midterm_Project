@@ -19,6 +19,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [ProductController::class, 'index'])->name('dashboard');
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
     Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit', 'index']);
+    Route::get('/products/trash', [ProductController::class, 'trash'])->name('products.trash');
+    Route::post('/products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+    Route::delete('/products/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.force-delete');
+    Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
 });
 
 Route::middleware(['auth'])->group(function () {

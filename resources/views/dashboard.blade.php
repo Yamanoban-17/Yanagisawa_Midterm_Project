@@ -67,10 +67,28 @@
         <!-- Inventory Management Section -->
         <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
             <div class="flex h-full flex-col p-6">
+
+
+
+            <div class="mb-4 flex justify-end">
+                    <form method="GET" action="{{ route('products.export') }}" class="inline">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        <input type="hidden" name="category_filter" value="{{ request('category_filter') }}">
+
+                        <button type="submit"
+                                class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export to PDF
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Add New Product Form -->
                 <div class="mb-6 rounded-lg border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-700 dark:bg-neutral-900/50">
                     <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Add New Product</h2>
-                    <form action="{{ route('products.store') }}" method="POST" class="grid gap-4 md:grid-cols-2">
+                    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="grid gap-4 md:grid-cols-2">
                         @csrf
                         <div>
                             <label for="name" class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Product Name</label>
@@ -119,10 +137,83 @@
                                 <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <!-- Photo Upload -->
+                        <div class="md:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                Employee Photo (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                name="photo"
+                                accept="image/jpeg,image/png,image/jpg"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:file:bg-blue-900/20 dark:file:text-blue-400"
+                            >
+                            <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                                JPG, PNG or JPEG. Max 2MB.
+                            </p>
+                            @error('photo')
+                                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+
                         <div class="md:col-span-2">
                             <button type="submit" class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                                 Add Product
                             </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Search & Filter Section -->
+                <div class="rounded-xl border mb-10 border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                    <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Search & Filter Employees</h2>
+
+                    <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
+                        <!-- Search Input -->
+                        <div class="md:col-span-1">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Search</label>
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Search by name or email"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                            >
+                        </div>
+
+                        
+                        <!-- Category Filter Dropdown -->
+                        <div class="md:col-span-1">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Filter by Category</label>
+                            <select
+                                name="category_filter"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                            >
+                                <option value="">All Categories</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category_filter') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach 
+                            </select>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-end gap-2 md:col-span-1">
+                            <button
+                                type="submit"
+                                class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                            >
+                                Apply Filters
+                            </button>
+                            <a
+                                href="{{ route('dashboard') }}"
+                                class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                            >
+                                Clear
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -136,6 +227,7 @@
                                 <thead>
                                     <tr class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/50">
                                         <th class="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-neutral-300">#</th>
+                                        <th class="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-neutral-300">Photo</th>
                                         <th class="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-neutral-300">Name</th>
                                         <th class="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-neutral-300">SKU</th>
                                         <th class="px-4 py-3 text-left text-sm font-semibold text-neutral-700 dark:text-neutral-300">Price</th>
@@ -148,6 +240,19 @@
                                     @foreach($products as $index => $product)
                                         <tr class="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
                                             <td class="px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">{{ $index + 1 }}</td>
+                                            <td class="px-4 py-3">
+                                            @if($product->photo)
+                                                <img
+                                                    src="{{ Storage::url($product->photo) }}"
+                                                    alt="{{ $product->name }}"
+                                                    class="h-12 w-12 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                                                >
+                                            @else
+                                                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    {{ strtoupper(substr($product->name, 0, 2)) }}
+                                                </div>
+                                            @endif
+                                        </td>
                                             <td class="px-4 py-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">{{ $product->name }}</td>
                                             <td class="px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">
                                                 <span class="font-mono text-xs">{{ $product->sku }}</span>
@@ -174,12 +279,12 @@
                                                 {{ $product->category ? $product->category->name : '—' }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
-                                                <button type="button" onclick="openEditModal({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ addslashes($product->sku) }}', {{ $product->price }}, {{ $product->stock }}, {{ $product->category_id ?? 'null' }}, '{{ addslashes($product->details ?? '') }}')" class="text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
+                                                <button type="button" onclick="openEditModal({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ addslashes($product->sku) }}', {{ $product->price }}, {{ $product->stock }}, {{ $product->category_id ?? 'null' }}, '{{ addslashes($product->details ?? '') }}', '{{ $product->photo ?? '' }}')" class="text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
                                                 <span class="mx-1 text-neutral-400">|</span>
                                                 <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                                                    <button type="submit" class="text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Trash</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -215,7 +320,7 @@
             </div>
 
             <!-- Modal Body -->
-            <form id="editProductForm" method="POST" class="p-6">
+            <form id="editProductForm" method="POST" enctype="multipart/form-data" class="p-6">
                 @csrf
                 @method('PUT')
                 <div class="grid gap-4 md:grid-cols-2">
@@ -268,6 +373,27 @@
                     </div>
                 </div>
 
+                <!-- Photo Upload in Edit Modal -->
+                <div class="md:col-span-2">
+                    <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Product Photo
+                    </label>
+
+                    <!-- Current Photo Preview -->
+                    <div id="currentPhotoPreview" class="mb-3"></div>
+
+                    <input
+                        type="file"
+                        id="edit_photo"
+                        name="photo"
+                        accept="image/jpeg,image/png,image/jpg"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:file:bg-blue-900/20 dark:file:text-blue-400"
+                    >
+                    <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                        Leave empty to keep current photo. JPG, PNG or JPEG. Max 2MB.
+                    </p>
+                </div>
+
                 <!-- Modal Footer -->
                 <div class="mt-6 flex gap-3">
                     <button type="submit" class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
@@ -282,7 +408,7 @@
     </div>
 
     <script>
-        function openEditModal(productId, name, sku, price, stock, categoryId, details) {
+        function openEditModal(productId, name, sku, price, stock, categoryId, details, photo) {
             const modal = document.getElementById('editModal');
             const form = document.getElementById('editProductForm');
             const nameInput = document.getElementById('edit_name');
@@ -307,6 +433,26 @@
                 categoryInput.value = categoryId;
             } else {
                 categoryInput.value = '';
+            }
+
+            // Display current photo in edit modal
+            const photoPreview = document.getElementById('currentPhotoPreview');
+            if (photo) {
+                photoPreview.innerHTML = `
+                    <div class="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-700">
+                        <img src="/storage/${photo}" alt="${name}" class="h-16 w-16 rounded-full object-cover">
+                        <div>
+                            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Current Photo</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Upload new photo to replace</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                photoPreview.innerHTML = `
+                    <div class="rounded-lg border border-dashed border-neutral-300 p-4 text-center dark:border-neutral-600">
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">No photo uploaded</p>
+                    </div>
+                `;
             }
 
             // Show modal

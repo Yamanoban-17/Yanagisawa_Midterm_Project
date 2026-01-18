@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('price', 8, 2);
             $table->integer('stock')->default(0);
             // The foreign key will be added in the next dedicated migration
+            $table->string('photo')->nullable();
             $table->timestamps();
         });
     }
